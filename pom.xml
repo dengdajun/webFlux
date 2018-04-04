@@ -100,7 +100,7 @@
       </build>
     </profile>
     <profile>
-      <id>cloud</id>
+      <id>docker</id>
       <properties>
         <spring.profiles.active>docker</spring.profiles.active>
       </properties>
@@ -128,7 +128,7 @@
       </build>
     </profile>
     <profile>
-      <id>docker</id>
+      <id>cloud</id>
       <properties>
         <spring.profiles.active>docker</spring.profiles.active>
       </properties>

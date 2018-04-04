@@ -8,10 +8,9 @@ language: java
 jdk:
   - oraclejdk8
 
-#env:
-#  global:
-#    - DOCKER_USERNAME=sky233
-#    - secure: "Sf1oTZdtlmHoFTZo7GMMWZ1vmkjj2NZEYuCOs9Gz6hHqWLMY9UfrWbsoyKR6oBaAJAz+e/9s65wvauSxTQUJwSQUuD46eq7BO2UXOO6WxACQF48ljnOZhNtADWdB5JizhwWbpUEi2G6n/Pu3WumeuzX5yI2f34Q85zNpuLFv2kFxVB02EX6DZ0MK7njG/fwR8fp2XOkCUNUIbkkdfQXtp8XQisw0UsUigsWu0iR+QGZ4DTXQKjZiwMMQubU6Vb84IX9LIWT0R9kfeKD1kePpUL79Y0FyK8dxnUFNcSOtKwI5hpuvY6nMAN39cyThrdq2RBmSkpmo7DEFprrliU8TQAoVQTHE/bZurQaaNP9jXYROi2RN9/u8iqQe0V+zCzdeUv2bgSWcWkr/o8///xPlyePel5vyqDXAQzM8r81PtR8PoTgx7QDEFeauf3qCevRLrBYV8qkO1paGrFtruIEeqKH9EM+KrzECI/ZzOnyzX4+vFyq9RofO/VqVlUTzVjySktTkvLyI8ZplnoUQBbFB3oGpw8PaM8TWFbOsYclX3GxLf2RJ+9NYAaMa39sZg/BeWxmwj+leXMaezQUjea1sh+Cr2sT/BrkmO1To9K1r7HgCizgRTQ8Dd5ie+1kgfJ4x8mGR4ysOcjALkuke3XYNIdSCZyDYG0iDlhA+r8lLuyk="
+env:
+  global:
+    - PROFILE=cloud
 
 branches:
   only:
@@ -21,14 +20,16 @@ before_install:
   - docker version
   - docker info
 
-script:
-  - ./mvnw --settings cloud-settings.xml clean install -Pcloud
+install:
+  - ./mvnw --settings cloud-settings.xml clean install -P$PROFILE
 
 after_success:
   # test coverage reporting
   - bash <(curl -s https://codecov.io/bash)
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - export APP=sky233/web-flux
+  - if [ "$PROFILE" == "cloud" ]; then
+  - docker build -t $APP ./target/docker
+    fi
   - docker images
-#  - export APP=sky233/web-flux
-#  - docker build -t $APP ./target/docker
-#  - docker push $APP
+  - docker push $APP

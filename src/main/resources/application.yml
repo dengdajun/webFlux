@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: webFlux
+  profiles:
+    active: @spring.profiles.active@
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: Hikari-pool
+      connection-timeout: 60000
+      minimum-idle: 4
+      maximum-pool-size: 4
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57Dialect
+        dialect.storage_engine: innodb
+      show-sql: true
+      format_sql: true
+      generate-ddl: true
+    open-in-view: false
+
+  jackson:
+    deserialization:
+      ADJUST_DATES_TO_CONTEXT_TIME_ZONE: false
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+server:
+  port: ${PORT:8081}
+
+---
+spring:
+  profiles: dev
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:testdb:MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+---
+spring:
+  profiles: local
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/test?useSSL=false&characterEncoding=utf8&characterSetResults=utf8&useUnicode=false&rewriteBatchedStatements=true&autoReconnect=true
+    username: root
+    password: 123456
+
+---
+spring:
+  profiles: cloud
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/webFlux?useSSL=false&characterEncoding=utf8&characterSetResults=utf8&useUnicode=false&rewriteBatchedStatements=true&autoReconnect=true
+    username: root
+    password: 123456
+
+---
+spring:
+  profiles: docker
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:webFlux}?useSSL=false&characterEncoding=utf8&characterSetResults=utf8&useUnicode=false&rewriteBatchedStatements=true&autoReconnect=true
+    username: ${MYSQL_USER:webFlux}
+    password: ${MYSQL_PASSWORD:webFlux}

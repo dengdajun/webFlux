@@ -1,0 +1,28 @@
+sudo: required
+
+services:
+  - docker
+
+language: java
+
+jdk:
+  - oraclejdk8
+
+env:
+  global:
+    - DOCKER_USERNAME=sky233
+
+branches:
+  only:
+    - master
+
+before_install:
+  - docker version
+  - docker info
+
+after_success:
+  # test coverage reporting
+  - echo $DOCKER_USERNAME
+  - bash <(curl -s https://codecov.io/bash)
+  # deploy snapshots to Maven central, but only from master branch
+  # "[[ $TRAVIS_BRANCH == \"master\" ]] && mvn --settings cloud-settings.xml -DskipTests -B deploy"

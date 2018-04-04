@@ -1,6 +1,8 @@
 <!--
 Used by Travis to deploy snapshots to Maven central / OSSRH after a successful
 build on the master branch. See .travis.yml for more.
+
+travis encrypt MY_SECRET_ENV="super_secret" -add
 -->
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

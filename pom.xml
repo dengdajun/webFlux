@@ -5,7 +5,7 @@
 
   <groupId>com.believe</groupId>
   <artifactId>webFlux</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <packaging>jar</packaging>
 
   <name>webFlux</name>
@@ -46,7 +46,7 @@
   <scm>
     <connection>scm:git:https://github.com/sky233/webFlux.git</connection>
     <developerConnection>scm:git:git@github.com:sky233/webFlux.git</developerConnection>
-    <url>https://github.com/sky233/foundation</url>
+    <url>https://github.com/sky233/webFlux</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -70,17 +70,49 @@
             <version>${docker-maven-plugin.version}</version>
             <configuration>
               <skipDockerPush>true</skipDockerPush>
-              <imageName>web-flux</imageName>
-              <dockerDirectory>${basedir}/src/main/docker</dockerDirectory>
               <dockerCertPath>/Users/lixingping/soft/server/server03/cert</dockerCertPath>
               <dockerHost>https://192.168.0.115:2376</dockerHost>
-              <resources>
-                <resource>
-                  <targetPath>/</targetPath>
-                  <directory>${project.build.directory}</directory>
-                  <include>${project.build.finalName}.jar</include>
-                </resource>
-              </resources>
+            </configuration>
+            <executions>
+              <execution>
+                <id>build-image</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>install</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>sources</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>cloud</id>
+      <properties>
+        <spring.profiles.active>docker</spring.profiles.active>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>${docker-maven-plugin.version}</version>
+            <configuration>
+              <serverId>docker-hub</serverId>
+              <registryUrl>https://index.docker.io/v1/</registryUrl>
             </configuration>
             <executions>
               <execution>
@@ -98,7 +130,6 @@
     <profile>
       <id>docker</id>
       <properties>
-        <!--<skipTests>false</skipTests>-->
         <spring.profiles.active>docker</spring.profiles.active>
       </properties>
       <build>
@@ -108,19 +139,10 @@
             <artifactId>docker-maven-plugin</artifactId>
             <version>${docker-maven-plugin.version}</version>
             <configuration>
-              <imageName>web-flux:latest</imageName>
-              <dockerDirectory>${basedir}/src/main/docker</dockerDirectory>
               <dockerHost>https://119.23.204.228:2376</dockerHost>
               <dockerCertPath>/Users/lixingping/soft/server/cloud/cert</dockerCertPath>
               <serverId>docker-hub</serverId>
               <registryUrl>https://index.docker.io/v1/</registryUrl>
-              <resources>
-                <resource>
-                  <targetPath>/</targetPath>
-                  <directory>${project.build.directory}</directory>
-                  <include>${project.build.finalName}.jar</include>
-                </resource>
-              </resources>
             </configuration>
             <executions>
               <execution>
@@ -215,7 +237,7 @@
   </dependencies>
 
   <build>
-    <finalName>webFlux</finalName>
+    <finalName>web-flux</finalName>
     <plugins>
 
       <plugin>
@@ -224,24 +246,12 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>install</id>
-            <phase>install</phase>
-            <goals>
-              <goal>sources</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
         <version>${docker-maven-plugin.version}</version>
         <configuration>
+          <imageName>${project.build.finalName}:${project.version}</imageName>
+          <dockerDirectory>src/main/docker</dockerDirectory>
           <resources>
             <resource>
               <targetPath>/</targetPath>
@@ -285,6 +295,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
+          <branchName>master</branchName>
           <tagNameFormat>v_@{project.version}</tagNameFormat>
           <tagBase>${project.scm.connection}</tagBase>
         </configuration>

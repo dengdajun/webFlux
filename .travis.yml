@@ -21,10 +21,13 @@ before_install:
   - docker version
   - docker info
 
+script:
+  - ./mvnw clean install -Pcloud
+
 after_success:
   # test coverage reporting
-  - echo $DOCKER_USERNAME
-  - echo $DOCKER_PASSWORD
   - bash <(curl -s https://codecov.io/bash)
-  # deploy snapshots to Maven central, but only from master branch
-  # "[[ $TRAVIS_BRANCH == \"master\" ]] && mvn --settings cloud-settings.xml -DskipTests -B deploy"
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - export APP=sky233/web-flux
+  - docker build -t $APP ./target/docker
+  - docker push $APP
